@@ -1,0 +1,42 @@
+_format_version: "3.0"
+
+services:
+  - name: url-service
+    url: http://host.docker.internal:3000
+
+    routes:
+      - name: url-routes
+        paths:
+          - /api
+        strip_path: true 
+        # paths:
+        #   - /urls
+        # strip_path: false
+
+    plugins:
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - "apikey:my-secret-api-key"   # ✅ correct
+
+      - name: rate-limiting
+        config:
+          minute: 100
+
+      - name: file-log
+        config:
+          path: /tmp/kong.log
+
+  - name: user-service
+    url: http://host.docker.internal:4000
+    routes:
+      - name: user-routes
+        paths:
+          - /users
+        strip_path: false
+
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 50
