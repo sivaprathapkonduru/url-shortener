@@ -8,7 +8,13 @@
     "format:backend": "cd url-shortener-backend && npm run format",
     "type-check:backend": "cd url-shortener-backend && npx tsc --noEmit",
 
-    "type-check": "npm run type-check:backend"
+    "type-check": "npm run type-check:backend",
+
+    "test:backend": "cd url-shortener-backend && npm run test",
+
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:integration": "cd url-shortener-backend && npm run test:integration",
+    "test:e2e": "cd url-shortener-backend && npm run test:e2e"
   },
   "lint-staged": {
     "url-shortener-backend/**/*.{ts,js}": [

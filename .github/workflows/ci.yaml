@@ -1,24 +1,52 @@
-name: CI Pipeline
+name: Full CI Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
+  pull_request:
 
 jobs:
-  build:
+  test-quality-security:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
 
-      - name: Install Dependencies
+      - name: Install deps
         run: npm install
 
-      - name: Run Tests
-        run: npm test
+      # ✅ Lint
+      - name: Lint
+        run: npm run lint:backend
+
+      # ✅ Unit tests
+      - name: Unit Tests
+        run: npm run test
+
+      # ✅ Integration tests
+      - name: Integration Tests
+        run: npm run test:integration
+
+      # ✅ E2E tests
+      - name: E2E Tests
+        run: npm run test:e2e
+
+      # 🔐 SNYK (ONLY HERE)
+      - name: Snyk Security Scan
+        run: |
+          npm install -g snyk
+          snyk test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # 🔍 SONAR (ONLY HERE)
+      - name: SonarQube Scan
+        run: npx sonar-scanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
