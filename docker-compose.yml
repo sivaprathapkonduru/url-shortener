@@ -1,0 +1,48 @@
+services:
+  backend:
+    build:
+      context: ./url-shortener-backend
+    container_name: backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./url-shortener-backend:/app
+      - /app/node_modules
+    working_dir: /app
+    command: sh -c "npm install && npm run start:dev"
+
+  kong:
+    image: kong:3.6
+    platform: linux/amd64
+    container_name: kong
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/kong.yaml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    volumes:
+      - ./kong:/kong
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    depends_on:
+      - backend   # ✅ FIXED
+
+  sonarqube:
+    image: sonarqube:lts
+    platform: linux/amd64
+    ports:
+      - "9000:9000"
+
+  postgres:
+    image: postgres:15
+    platform: linux/amd64
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: url_shortener
+    ports:
+      - "5432:5432"
