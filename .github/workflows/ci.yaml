@@ -1,52 +1,72 @@
-name: Full CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: ["main"]
-  pull_request:
+    branches:
+      - develop
+      - main
 
 jobs:
-  test-quality-security:
+
+  # 🔹 COMMON BUILD + TEST
+  build-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install deps
+      - name: Install
         run: npm install
 
-      # ✅ Lint
       - name: Lint
         run: npm run lint:backend
 
-      # ✅ Unit tests
       - name: Unit Tests
         run: npm run test
 
-      # ✅ Integration tests
       - name: Integration Tests
         run: npm run test:integration
 
-      # ✅ E2E tests
       - name: E2E Tests
         run: npm run test:e2e
 
-      # 🔐 SNYK (ONLY HERE)
-      - name: Snyk Security Scan
+  # 🔵 STAGING DEPLOY (develop)
+  deploy-staging:
+    needs: build-test
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Staging
+        run: |
+          echo "🚀 Deploying to STAGING..."
+          docker-compose up -d --build
+
+  # 🔴 PRODUCTION DEPLOY (main)
+  deploy-production:
+    needs: build-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Security Scan (Snyk)
         run: |
           npm install -g snyk
           snyk test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      # 🔍 SONAR (ONLY HERE)
       - name: SonarQube Scan
         run: npx sonar-scanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Deploy to Production
+        run: |
+          echo "🔥 Deploying to PRODUCTION..."
+          docker-compose up -d --build
