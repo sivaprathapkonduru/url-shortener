@@ -1,27 +1,29 @@
 {
   "name": "enterprise-monorepo",
   "private": true,
+  "scripts": {
+    "prepare": "husky",
+
+    "lint:backend": "cd url-shortener-backend && npm run lint",
+    "format:backend": "cd url-shortener-backend && npm run format",
+    "type-check:backend": "cd url-shortener-backend && npx tsc --noEmit",
+
+    "type-check": "npm run type-check:backend"
+  },
+  "lint-staged": {
+    "url-shortener-backend/**/*.{ts,js}": [
+      "npm run lint:backend",
+      "npm run format:backend"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
   "devDependencies": {
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.0.0",
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0"
-  },
-  "scripts": {
-    "prepare": "husky",
-    "lint:backend": "cd url-shortener-backend && npm run lint",
-    "format:backend": "cd url-shortener-backend && npm run format",
-    "type-check:backend": "cd url-shortener-backend && npx tsc --noEmit",
-    "type-check": "npm run type-check:url-shortener-backend"
-  },
-  "lint-staged": {
-    "url-shortener-backend/**/*.{ts,js}": [
-      "cd url-shortener-backend && npx eslint --fix",
-      "cd url-shortener-backend && npx prettier --write"
-    ],
-    "*.{json,md}": [
-      "prettier --write"
-    ]
   }
 }
