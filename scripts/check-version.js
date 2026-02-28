@@ -1,6 +1,6 @@
 const { execSync } = require('node:child_process');
 
-const SERVICES = ['user-service', 'url-service', 'graphql-service'];
+const SERVICES = ['user-service', 'url-shortener-service', 'graphql-service', 'package.json'];
 
 try {
   // Get staged files
