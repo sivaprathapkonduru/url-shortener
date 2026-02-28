@@ -19,7 +19,7 @@ try {
       }
     });
   });
-
+  console.log(affectedServices, 'affectedServices')
   if (affectedServices.size === 0) {
     console.log('✅ No service changes detected');
     process.exit(0);
