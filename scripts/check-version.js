@@ -29,6 +29,7 @@ try {
 
   affectedServices.forEach(service => {
     const pkgPath = `${service}/package.json`;
+    console.log(pkgPath)
 
     const isVersionChanged = stagedFiles.includes(pkgPath);
 
