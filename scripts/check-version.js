@@ -1,6 +1,6 @@
 const { execSync } = require('node:child_process');
 
-const SERVICES = ['user-service', 'url-shortener-service', 'graphql-service', 'package.json'];
+const SERVICES = ['user-service', 'url-shortener-service', 'package.json'];
 
 try {
   // Get staged files
@@ -14,7 +14,7 @@ try {
   // Detect which services changed
   stagedFiles.forEach(file => {
     SERVICES.forEach(service => {
-      if (file.startsWith(`services/${service}/`)) {
+      if (file.startsWith(`${service}/`)) {
         affectedServices.add(service);
       }
     });
@@ -28,7 +28,7 @@ try {
   let hasError = false;
 
   affectedServices.forEach(service => {
-    const pkgPath = `services/${service}/package.json`;
+    const pkgPath = `${service}/package.json`;
 
     const isVersionChanged = stagedFiles.includes(pkgPath);
 
