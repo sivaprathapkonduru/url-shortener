@@ -1,6 +1,6 @@
 const { execSync } = require('node:child_process');
 
-const SERVICES = ['user-service', 'url-shortener-service', 'package.json'];
+const SERVICES = ['user-service', 'url-shortener-service', 'graphql-service'];
 
 try {
   // Get staged files
@@ -9,9 +9,11 @@ try {
     .split('\n')
     .filter(Boolean);
 
+  console.log('🧾 Staged Files:', stagedFiles);
+
   const affectedServices = new Set();
 
-  // Detect which services changed
+  // Detect changed services
   stagedFiles.forEach(file => {
     SERVICES.forEach(service => {
       if (file.startsWith(`${service}/`)) {
@@ -19,7 +21,9 @@ try {
       }
     });
   });
-  console.log(affectedServices, 'affectedServices')
+
+  console.log('📦 Affected Services:', [...affectedServices]);
+
   if (affectedServices.size === 0) {
     console.log('✅ No service changes detected');
     process.exit(0);
@@ -29,22 +33,32 @@ try {
 
   affectedServices.forEach(service => {
     const pkgPath = `${service}/package.json`;
-    console.log(pkgPath)
 
-    const isVersionChanged = stagedFiles.includes(pkgPath);
+    // 🔥 Check if package.json is staged
+    const isPkgStaged = stagedFiles.includes(pkgPath);
 
-    if (!isVersionChanged) {
-      console.error(
-        `❌ ${service} changed but version not bumped in package.json`
-      );
+    if (!isPkgStaged) {
+      console.error(`❌ ${service} changed but package.json not updated`);
+      hasError = true;
+      return;
+    }
+
+    // 🔥 Check if version actually changed
+    const diff = execSync(`git diff --cached ${pkgPath}`).toString();
+
+    const versionChanged =
+      diff.includes('"version"') && (diff.includes('+') || diff.includes('-'));
+
+    if (!versionChanged) {
+      console.error(`❌ ${service} package.json updated but version not changed`);
       hasError = true;
     } else {
-      console.log(`✅ ${service} version updated`);
+      console.log(`✅ ${service} version updated correctly`);
     }
   });
 
   if (hasError) {
-    console.error('\n🚫 Commit blocked: Please bump version before committing.');
+    console.error('\n🚫 Commit blocked: Please bump version properly.');
     process.exit(1);
   }
 
