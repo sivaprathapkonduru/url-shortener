@@ -3,15 +3,11 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
-
     "lint:backend": "cd url-shortener-backend && npm run lint",
     "format:backend": "cd url-shortener-backend && npm run format",
     "type-check:backend": "cd url-shortener-backend && npx tsc --noEmit",
-
     "type-check": "npm run type-check:backend",
-
     "test:backend": "cd url-shortener-backend && npm run test",
-
     "test": "npm run test:backend",
     "test:integration": "cd url-shortener-backend && npm run test:integration",
     "test:e2e": "cd url-shortener-backend && npm run test:e2e"
@@ -26,10 +22,13 @@
     ]
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "prettier": "^3.0.0",
-    "@commitlint/cli": "^19.0.0",
-    "@commitlint/config-conventional": "^19.0.0"
+    "prettier": "^3.0.0"
+  },
+  "dependencies": {
+    "@nestjs/config": "^4.0.3"
   }
 }
