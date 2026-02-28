@@ -43,11 +43,11 @@ services:
     depends_on:
       - backend # ✅ FIXED
 
-  # sonarqube:
-  #   image: sonarqube:lts
-  #   platform: linux/amd64
-  #   ports:
-  #     - "9000:9000"
+  sonarqube:
+    image: sonarqube:lts
+    platform: linux/amd64
+    ports:
+      - "9000:9000"
 
   graphql-service:
     build: ./graphql-service
