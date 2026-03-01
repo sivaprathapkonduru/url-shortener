@@ -8,6 +8,7 @@ try {
         .toString()
         .split('\n')
         .filter(Boolean);
+        
     if (stagedFiles.length === 0) {
         console.error('❌ No staged files found. Did you forget git add?');
         process.exit(1);
@@ -37,9 +38,10 @@ try {
 
         // 🔥 Check if package.json is staged
         const isPkgStaged = stagedFiles.includes(pkgPath);
+        console.log(isPkgStaged)
 
         if (!isPkgStaged) {
-            console.error(`❌ ${service} changed but package.json not updated`);
+            console.error(`❌ ${service} changed but package.json version was not updated. Current version `);
             hasError = true;
             return;
         }

@@ -6,16 +6,16 @@
     "lint:backend": "cd url-shortener-service && npm run lint",
     "format:backend": "cd url-shortener-service && npm run format",
     "type-check:backend": "cd url-shortener-service && npx tsc --noEmit",
-    "type-check": "npm run type-check:url-shortener-service",
+    "type-check": "npm run type-check:backend",
     "test:backend": "cd url-shortener-service && npm run test",
-    "test": "npm run test:url-shortener-service",
+    "test": "npm run test:backend",
     "test:integration": "cd url-shortener-service && npm run test:integration",
     "test:e2e": "cd url-shortener-service && npm run test:e2e"
   },
   "lint-staged": {
     "url-shortener-service/**/*.{ts,js}": [
-      "npm run lint:url-shortener-service",
-      "npm run format:url-shortener-service"
+      "npm run lint:backend",
+      "npm run format:backend"
     ],
     "*.{json,md}": [
       "prettier --write"
