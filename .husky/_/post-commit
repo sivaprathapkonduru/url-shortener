@@ -11,5 +11,3 @@ if [ $? -ne 0 ]; then
   echo "❌ Type check failed. Commit aborted."
   exit 1
 fi
-
-node scripts/check-version.js || exit 1

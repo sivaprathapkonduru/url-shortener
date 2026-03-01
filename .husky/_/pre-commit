@@ -1,2 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname "$0")/h"
+
+node scripts/check-version.js || exit 1
