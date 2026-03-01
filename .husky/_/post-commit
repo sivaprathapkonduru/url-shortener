@@ -12,7 +12,4 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-#!/bin/sh
-. "$(dirname "$0")/husky.sh"
-
 node scripts/check-version.js || exit 1
