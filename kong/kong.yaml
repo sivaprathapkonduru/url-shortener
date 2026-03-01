@@ -28,15 +28,15 @@ services:
         config:
           path: /tmp/kong.log
 
-  - name: user-service
-    url: http://host.docker.internal:4000
-    routes:
-      - name: user-routes
-        paths:
-          - /users
-        strip_path: false
+  # - name: user-service
+  #   url: http://host.docker.internal:4000
+  #   routes:
+  #     - name: user-routes
+  #       paths:
+  #         - /users
+  #       strip_path: false
 
-    plugins:
-      - name: rate-limiting
-        config:
-          minute: 50
+  #   plugins:
+  #     - name: rate-limiting
+  #       config:
+  #         minute: 50
