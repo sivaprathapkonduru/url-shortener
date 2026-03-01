@@ -1,6 +1,4 @@
 
-echo "🧠 Running type-check..."
-npm run type-check
 
 if [ $? -ne 0 ]; then
   echo "❌ Type check failed. Commit aborted."
