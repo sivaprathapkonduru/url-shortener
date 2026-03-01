@@ -12,8 +12,6 @@ try {
         console.error('❌ No staged files found. Did you forget git add?');
         process.exit(1);
     }
-    console.log('🧾 Staged Files:', stagedFiles);
-
     const affectedServices = new Set();
 
     // Detect changed services
