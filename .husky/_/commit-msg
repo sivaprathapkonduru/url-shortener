@@ -1,6 +1,0 @@
-# #!/usr/bin/env sh
-# . "$(dirname "$0")/h"
-
-#!/bin/sh
-
-npx --no-install commitlint --edit "$1"
