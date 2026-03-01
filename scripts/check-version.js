@@ -38,7 +38,6 @@ try {
 
         // 🔥 Check if package.json is staged
         const isPkgStaged = stagedFiles.includes(pkgPath);
-        console.log(isPkgStaged)
 
         if (!isPkgStaged) {
             console.error(`❌ ${service} changed but package.json version was not updated. Current version `);
