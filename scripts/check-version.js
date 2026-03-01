@@ -1,4 +1,5 @@
 const { execSync } = require('node:child_process');
+const fs = require('fs');
 
 const SERVICES = ['user-service', 'url-shortener-service', 'graphql-service'];
 
@@ -36,11 +37,13 @@ try {
     affectedServices.forEach(service => {
         const pkgPath = `${service}/package.json`;
 
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+
         // 🔥 Check if package.json is staged
         const isPkgStaged = stagedFiles.includes(pkgPath);
 
         if (!isPkgStaged) {
-            console.error(`❌ ${service} changed but package.json version was not updated. Current version `);
+            console.error(`❌ ${service} changed but package.json version was not updated. Current version: "${pkg.version}"`);
             hasError = true;
             return;
         }
