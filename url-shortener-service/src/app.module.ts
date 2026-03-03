@@ -9,8 +9,9 @@ import { DatabaseModule } from './databases/database.module';
     ConfigModule.forRoot({
       // isGlobal: true,
       load: [configuration],
-    }), UrlShortenerModule,
-    DatabaseModule
+    }),
+    UrlShortenerModule,
+    DatabaseModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

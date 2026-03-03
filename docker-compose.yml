@@ -1,27 +1,27 @@
 services:
-  ur-service:
-    build:
-      context: ./url-shortener-service
-    container_name: user-service
-    ports:
-      - "3000:3000"
-    depends_on: 
-      - redis
-    volumes:
-      - ./url-shortener-service:/app
-      - /app/node_modules
-    working_dir: /app
-    command: sh -c "npm install && npm run start:dev"
+  # url-service:
+  #   build:
+  #     context: ./url-shortener-service
+  #   container_name: user-service
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on: 
+  #     - redis
+  #   volumes:
+  #     - ./url-shortener-service:/app
+  #     - /app/node_modules
+  #   working_dir: /app
+  #   command: sh -c "npm install && npm run start:dev"
 
-  user-service:
-    build: ./user-service
-    ports:
-      - "3001:3001"
-    depends_on:
-      - redis
-      - rabbitmq
-    environment:
-      REDIS_HOST: redis
+  # user-service:
+  #   build: ./user-service
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     # - redis
+  #     # - rabbitmq
+  #   environment:
+  #     REDIS_HOST: redis
 
   kong:
     image: kong:3.6
@@ -43,33 +43,33 @@ services:
     depends_on:
       - user-service # ✅ FIXED
 
-  sonarqube:
-    image: sonarqube:lts
-    platform: linux/amd64
-    ports:
-      - "9000:9000"
-
-  # graphql-service:
-  #   build: ./graphql-service
+  # sonarqube:
+  #   image: sonarqube:lts
+  #   platform: linux/amd64
   #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - user-service
-  #     - url-service
-  #     - redis
+  #     - "9000:9000"
 
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
+  # redis:
+  #   image: redis:7
+  #   ports:
+  #     - "6379:6379"
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
 
-  mongodb:
-    image: mongo
+  # mongodb:
+  #   image: mongo
+  #   ports:
+  #     - "27017:27017"
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: userDB
+      POSTGRES_PASSWORD: userdbpassword
+      POSTGRES_DB: userdb
     ports:
-      - "27017:27017"
+      - "5432:5432"
