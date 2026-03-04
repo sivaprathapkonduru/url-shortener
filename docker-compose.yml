@@ -1,27 +1,50 @@
-services:
-  # url-service:
-  #   build:
-  #     context: ./url-shortener-service
-  #   container_name: user-service
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on: 
-  #     - redis
-  #   volumes:
-  #     - ./url-shortener-service:/app
-  #     - /app/node_modules
-  #   working_dir: /app
-  #   command: sh -c "npm install && npm run start:dev"
+version: "3.9"
 
-  # user-service:
-  #   build: ./user-service
-  #   ports:
-  #     - "3001:3001"
-  #   depends_on:
-  #     # - redis
-  #     # - rabbitmq
-  #   environment:
-  #     REDIS_HOST: redis
+services:
+  url-service:
+    build:
+      context: ./url-shortener-service
+    container_name: url-shortener-service
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./url-shortener-service:/app
+      - /app/node_modules
+    working_dir: /app
+    command: npm run start:dev
+    environment:
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: userdb
+      DB_PASSWORD: userdbpassword
+      JWT_SECRET: mysecret
+      MONGODB_URI: mongodb+srv://rencontrer:rencontrer@rencontrer.e9fx0.mongodb.net/url
+      REDIS_HOST: redis-14480.crce281.ap-south-1-3.ec2.cloud.redislabs.com
+      REDIS_PORT: 14480
+      REDIS_USERNAME: default
+      REDIS_PASSWORD: wDJRJwvbzDDwSiALnVIoISrgk6KqK523
+      REDIS_DB: 0
+    depends_on:
+      - postgres
+
+  user-service:
+    build:
+      context: ./user-service
+    container_name: user-service
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./user-service:/app
+      - /app/node_modules
+    working_dir: /app
+    command: sh -c "sleep 5 && npx prisma migrate deploy && npx prisma generate && npm run start:dev"
+    environment:
+      DATABASE_URL: postgresql://userdb:userdbpassword@postgres:5432/userdb
+      PORT: 4000
 
   kong:
     image: kong:3.6
@@ -30,10 +53,6 @@ services:
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /kong/kong.yaml
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
     volumes:
       - ./kong:/kong
@@ -41,35 +60,26 @@ services:
       - "8000:8000"
       - "8001:8001"
     depends_on:
-      - user-service # ✅ FIXED
-
-  # sonarqube:
-  #   image: sonarqube:lts
-  #   platform: linux/amd64
-  #   ports:
-  #     - "9000:9000"
-
-  # redis:
-  #   image: redis:7
-  #   ports:
-  #     - "6379:6379"
-
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   ports:
-  #     - "5672:5672"
-  #     - "15672:15672"
-
-  # mongodb:
-  #   image: mongo
-  #   ports:
-  #     - "27017:27017"
+      - user-service
+      - url-service
 
   postgres:
     image: postgres:16
+    container_name: postgres-db
+    restart: always
     environment:
-      POSTGRES_USER: userDB
+      POSTGRES_USER: userdb
       POSTGRES_PASSWORD: userdbpassword
       POSTGRES_DB: userdb
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U userdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
