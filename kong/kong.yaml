@@ -2,41 +2,49 @@ _format_version: "3.0"
 
 services:
   - name: url-service
-    url: http://host.docker.internal:3000
-
+    url: http://url-service:3000   # 🔥 use service name, not host.docker.internal
     routes:
       - name: url-routes
         paths:
           - /api
-        strip_path: true 
-        # paths:
-        #   - /urls
-        # strip_path: false
-
+        strip_path: true
     plugins:
       - name: request-transformer
         config:
           add:
             headers:
-              - "apikey:my-secret-api-key"   # ✅ correct
-
+              - "apikey:my-secret-api-key"
       - name: rate-limiting
         config:
           minute: 100
-
       - name: file-log
         config:
           path: /tmp/kong.log
+      - name: cors
+        config:
+          origins: ["*"]
+          methods: ["GET", "POST", "PUT", "DELETE"]
 
   - name: user-service
-    url: http://host.docker.internal:4000
+    url: http://user-service:4000   # 🔥 use docker service name
     routes:
       - name: user-routes
         paths:
-          - /users
-        strip_path: false
-
+          - /userApi
+        strip_path: true
     plugins:
       - name: rate-limiting
         config:
           minute: 50
+      - name: response-transformer
+        config:
+          add:
+            headers:
+              - "apikey:my-secret-api-key"
+      - name: file-log
+        config:
+          path: /tmp/kong.log
+      - name: cors
+        config:
+          origins: ["*"]
+          methods: ["GET", "POST", "PUT", "DELETE"]

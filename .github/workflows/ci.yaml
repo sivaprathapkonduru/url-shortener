@@ -24,7 +24,13 @@ jobs:
         run: npm install
 
       - name: Lint
-        run: npm run lint:backend
+        run: npm run lint:url-shortner-service
+
+      - name: Run type-check
+        run: node scripts/type-check.js
+
+      - name: Run version check
+        run: node scripts/check-version.js
 
       - name: Unit Tests
         run: npm run test

@@ -1,5 +1,5 @@
-const { execSync } = require('node:child_process');
-const fs = require('fs');
+import { execSync } from 'node:child_process';
+import fs from "node:fs";
 
 const SERVICES = ['user-service', 'url-shortener-service', 'graphql-service'];
 
@@ -55,10 +55,10 @@ try {
             diff.includes('"version"') && (diff.includes('+') || diff.includes('-'));
 
         if (!versionChanged) {
-            console.error(`❌ ${service} package.json updated but version not changed`);
+            console.error(`❌ ${service} package.json updated but version not changed. Current version: "${pkg.version}"`);
             hasError = true;
         } else {
-            console.log(`✅ ${service} version updated correctly`);
+            console.log(`✅ ${service} version updated correctly. Current version: "${pkg.version}"`);
         }
     });
 

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong
+  template:
+    metadata:
+      labels:
+        app: kong
+    spec:
+      containers:
+        - name: kong
+          image: kong:3.6
+          env:
+            - name: KONG_DATABASE
+              value: "off"
+            - name: KONG_DECLARATIVE_CONFIG
+              value: /kong/kong.yaml
+          volumeMounts:
+            - name: kong-config
+              mountPath: /kong
+          ports:
+            - containerPort: 8000
+            - containerPort: 8001
+      volumes:
+        - name: kong-config
+          hostPath:
+            path: /absolute/path/to/your/kong
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong
+spec:
+  type: NodePort
+  selector:
+    app: kong
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30080

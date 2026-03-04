@@ -16,7 +16,8 @@ export class URLService {
     private readonly redisService: RedisService,
   ) {}
 
-  async create(createURLDto: any): Promise<URL> {  // Accept plain object
+  async create(createURLDto: any): Promise<URL> {
+    // Accept plain object
     const dto = plainToClass(CreateURLShortenerDto, createURLDto);
     const errors = await this.validator.validate(dto);
 
@@ -35,7 +36,7 @@ export class URLService {
 
   async findOne(id: string): Promise<URL | null> {
     const chachedURL = await this.redisService.get(id);
-    if(chachedURL) {
+    if (chachedURL) {
       return { _id: id, url: chachedURL } as unknown as URL;
     }
     return this.urlModel.findById(id).exec();
