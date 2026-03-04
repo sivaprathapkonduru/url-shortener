@@ -5,16 +5,9 @@ import { URLService } from './services/url-shortener.service';
 import { urlProviders } from './providers/url.providers';
 import { RedisModule } from 'src/common/redis/redis.module';
 
-
 @Module({
-    imports: [
-        DatabaseModule,
-        RedisModule
-    ],
-    controllers: [URLController],
-    providers: [
-        URLService,
-        ...urlProviders
-    ],
+  imports: [DatabaseModule, RedisModule],
+  controllers: [URLController],
+  providers: [URLService, ...urlProviders],
 })
 export class UrlShortenerModule {}
