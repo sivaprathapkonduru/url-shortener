@@ -26,6 +26,7 @@ export class URLService {
     }
 
     const created = new this.urlModel(dto);
+
     await this.redisService.set(created._id.toString(), created.url);
     return created.save();
   }

@@ -6,25 +6,29 @@ services:
       context: ./url-shortener-service
     container_name: url-shortener-service
     ports:
-      - "3000:3000"
+      - "${URL_SERVICE_PORT}"
+      - "50051" # gRPC port
+      # - "3000"
     volumes:
       - ./url-shortener-service:/app
       - /app/node_modules
     working_dir: /app
     command: npm run start:dev
-    environment:
-      PORT: 3000
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: userdb
-      DB_PASSWORD: userdbpassword
-      JWT_SECRET: mysecret
-      MONGODB_URI: mongodb+srv://rencontrer:rencontrer@rencontrer.e9fx0.mongodb.net/url
-      REDIS_HOST: redis-14480.crce281.ap-south-1-3.ec2.cloud.redislabs.com
-      REDIS_PORT: 14480
-      REDIS_USERNAME: default
-      REDIS_PASSWORD: wDJRJwvbzDDwSiALnVIoISrgk6KqK523
-      REDIS_DB: 0
+    # environment:
+    #   PORT: 3000
+    #   DB_HOST: postgres
+    #   DB_PORT: 5432
+    #   DB_USER: userdb
+    #   DB_PASSWORD: userdbpassword
+    #   JWT_SECRET: mysecret
+    #   MONGODB_URI: mongodb+srv://rencontrer:rencontrer@rencontrer.e9fx0.mongodb.net/url
+    #   REDIS_HOST: redis-14480.crce281.ap-south-1-3.ec2.cloud.redislabs.com
+    #   REDIS_PORT: 14480
+    #   REDIS_USERNAME: default
+    #   REDIS_PASSWORD: wDJRJwvbzDDwSiALnVIoISrgk6KqK523
+    #   REDIS_DB: 0
+    env_file:
+      - .env
     depends_on:
       - postgres
 
@@ -33,7 +37,7 @@ services:
       context: ./user-service
     container_name: user-service
     ports:
-      - "4000:4000"
+      - "${USER_SERVICE_PORT}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -43,8 +47,9 @@ services:
     working_dir: /app
     command: sh -c "sleep 5 && npx prisma migrate deploy && npx prisma generate && npm run start:dev"
     environment:
-      DATABASE_URL: postgresql://userdb:userdbpassword@postgres:5432/userdb
-      PORT: 4000
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}:-postgresql://userDB:userdbpassword@postgres:5432/userdb"
+      PORT: ${USER_SERVICE_PORT}
+      RABBITMQ_URL: ${RABBITMQ_URL}
 
   kong:
     image: kong:3.6
@@ -58,21 +63,40 @@ services:
       - ./kong:/kong
     ports:
       - "8000:8000"
-      - "8001:8001"
+      - "8001"
     depends_on:
       - user-service
       - url-service
+    expose:
+        - "8001"         # Admin API - internal only
+
+  # Internal admin tool
+  # kong-dashboard:
+  #   image: pgbi/kong-dashboard
+  #   ports:
+  #     - "8080:8080"    # Admin UI for developers
+  #   environment:
+  #     KONG_ADMIN_URL: http://kong:8001  # Uses internal port
+   # Admin service that can configure Kong
+  # kong-admin:
+  #   build: ./admin-panel
+  #   ports:
+  #     - "8080:8080"  # Your admin UI
+  #   environment:
+  #     KONG_ADMIN_URL: http://kong:8001  # Internal access
 
   postgres:
     image: postgres:16
     container_name: postgres-db
     restart: always
-    environment:
-      POSTGRES_USER: userdb
-      POSTGRES_PASSWORD: userdbpassword
-      POSTGRES_DB: userdb
+    # environment:
+    #   POSTGRES_USER: userDB
+    #   POSTGRES_PASSWORD: userdbpassword
+    #   POSTGRES_DB: userdb
+    env_file:
+      - .env
     ports:
-      - "5432:5432"
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

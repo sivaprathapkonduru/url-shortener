@@ -1,13 +1,14 @@
-import { IsString, MinLength } from 'class-validator';
+import { IsString, MinLength, IsUUID } from 'class-validator';
 
 export class CreateUserDto {
-    @IsString()
+    @IsUUID()
     id?: string = crypto.randomUUID();
 
     @IsString()
     email: string;
 
     @IsString()
+    // @IsEmpty({ message: 'Username should not be provided' })
     name: string;
 
     @IsString()
