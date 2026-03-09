@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package url;
+
+service UrlService {
+  rpc createShortURLGrpc (CreateUrlRequest) returns (UrlResponse);
+}
+
+message CreateUrlRequest {
+  string url = 1;
+}
+
+message UrlResponse {
+  string url = 1;
+}
